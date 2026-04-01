@@ -889,7 +889,11 @@ function ProfilForm({ profil, medecin, supabase, onSaved }: any) {
   const [form, setForm] = useState({
     prenom: profil?.prenom || '', nom: profil?.nom || '', telephone: profil?.telephone || '',
     specialite: medecin?.specialite || '', adresse: medecin?.adresse || '',
-    region: medecin?.region || '', tarif: medecin?.tarif ?? '', presentation: medecin?.presentation || '',
+    region: medecin?.region || '', tarif: medecin?.tarif ?? '',
+    presentation: medecin?.presentation || '',
+    formation: medecin?.formation || '',
+    experience_annees: medecin?.experience_annees || '',
+    langues: medecin?.langues || [] as string[],
   })
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -898,7 +902,17 @@ function ProfilForm({ profil, medecin, supabase, onSaved }: any) {
 
   useEffect(() => {
     if (!medecin) return
-    setForm(prev => ({ ...prev, specialite: medecin.specialite || prev.specialite, adresse: medecin.adresse || prev.adresse, region: medecin.region || prev.region, tarif: medecin.tarif != null ? medecin.tarif : prev.tarif, presentation: medecin.presentation || prev.presentation }))
+    setForm(prev => ({
+      ...prev,
+      specialite: medecin.specialite || prev.specialite,
+      adresse: medecin.adresse || prev.adresse,
+      region: medecin.region || prev.region,
+      tarif: medecin.tarif != null ? medecin.tarif : prev.tarif,
+      presentation: medecin.presentation || prev.presentation,
+      formation: medecin.formation || prev.formation,
+      experience_annees: medecin.experience_annees || prev.experience_annees,
+      langues: medecin.langues || prev.langues,
+    }))
   }, [medecin?.id])
 
   useEffect(() => {
@@ -907,14 +921,40 @@ function ProfilForm({ profil, medecin, supabase, onSaved }: any) {
     setAvatarUrl(profil.avatar_url || null)
   }, [profil?.id])
 
-  const SPECIALITES = ['Médecin généraliste', 'Cardiologue', 'Pédiatre', 'Dentiste', 'Sage-femme', 'Dermatologue', 'Gynécologue', 'Ophtalmologue']
-  const REGIONS = ['Antananarivo', 'Toamasina', 'Mahajanga', 'Fianarantsoa', 'Toliara', 'Antsiranana', 'Antsirabe', 'Ambositra']
+  const SPECIALITES = [
+    { groupe: 'Médecine générale', items: ['Médecin généraliste'] },
+    { groupe: 'Spécialités médicales', items: ['Cardiologue', 'Pneumologue', 'Gastro-entérologue', 'Neurologue', 'Endocrinologue', 'Rhumatologue', 'Néphrologue', 'Hématologue', 'Infectiologue', 'Interniste', 'Oncologue', 'Gériatre', 'Urgentiste'] },
+    { groupe: 'Chirurgie', items: ['Chirurgien général', 'Chirurgien orthopédiste', 'Chirurgien cardiaque', 'Chirurgien digestif', 'Neurochirurgien', 'Chirurgien plasticien', 'Urologue'] },
+    { groupe: 'Femme & enfant', items: ['Gynécologue', 'Obstétricien', 'Sage-femme', 'Pédiatre', 'Néonatologue'] },
+    { groupe: 'Tête & cou', items: ['Ophtalmologue', 'ORL', 'Dentiste', 'Stomatologiste', 'Orthodontiste'] },
+    { groupe: 'Peau', items: ['Dermatologue'] },
+    { groupe: 'Santé mentale', items: ['Psychiatre', 'Psychologue'] },
+    { groupe: 'Rééducation & thérapies', items: ['Kinésithérapeute', 'Physiothérapeute', 'Ergothérapeute', 'Orthophoniste', 'Ostéopathe', 'Podologue'] },
+    { groupe: 'Biologie & imagerie', items: ['Radiologue', 'Biologiste médical', 'Anatomo-pathologiste'] },
+    { groupe: 'Autres', items: ['Anesthésiste', 'Médecin du travail', 'Médecin sportif', 'Nutritionniste / Diététicien', 'Infirmier(e)', 'Aide-soignant(e)'] },
+  ]
+
+  const REGIONS = ['Antananarivo', 'Toamasina', 'Mahajanga', 'Fianarantsoa', 'Toliara', 'Antsiranana', 'Antsirabe', 'Ambositra', 'Morondava', 'Sambava', 'Manakara', 'Nosy Be']
+  const LANGUES_DISPONIBLES = ['Malagasy', 'Français', 'Anglais', 'Arabe', 'Chinois', 'Comorien']
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm({ ...form, [e.target.name]: e.target.value })
+
+  const toggleLangue = (langue: string) => {
+    setForm(prev => ({
+      ...prev,
+      langues: prev.langues.includes(langue) ? prev.langues.filter((l: string) => l !== langue) : [...prev.langues, langue]
+    }))
+  }
 
   const save = async () => {
     setSaving(true)
     await supabase.from('profils').update({ prenom: form.prenom, nom: form.nom, telephone: form.telephone }).eq('id', profil.id)
-    await supabase.from('medecins').update({ specialite: form.specialite, adresse: form.adresse, region: form.region, tarif: Number(form.tarif), presentation: form.presentation }).eq('id', profil.id)
+    await supabase.from('medecins').update({
+      specialite: form.specialite, adresse: form.adresse, region: form.region,
+      tarif: Number(form.tarif), presentation: form.presentation,
+      formation: form.formation, experience_annees: form.experience_annees ? Number(form.experience_annees) : null,
+      langues: form.langues,
+    }).eq('id', profil.id)
     onSaved?.(Number(form.tarif))
     setSaving(false); setSaved(true); setTimeout(() => setSaved(false), 3000)
     if (form.adresse) {
@@ -931,32 +971,94 @@ function ProfilForm({ profil, medecin, supabase, onSaved }: any) {
   }
 
   const labelStyle: React.CSSProperties = { fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#a8a090', display: 'block', marginBottom: '5px' }
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', background: '#faf8f4', border: '1.5px solid #f0ece2', borderRadius: '10px', fontFamily: 'Outfit, sans-serif', fontSize: '0.85rem', color: '#1a1512', outline: 'none' }
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', background: '#faf8f4', border: '1.5px solid #f0ece2', borderRadius: '10px', fontFamily: 'Outfit, sans-serif', fontSize: '0.85rem', color: '#1a1512', outline: 'none', boxSizing: 'border-box' as const }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-      <div><label style={labelStyle}>Photo de profil</label><AvatarUpload userId={profil.id} currentUrl={avatarUrl} supabase={supabase} role="medecin" onUpload={(url: string) => setAvatarUrl(url)} /></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+      {/* LIEN PAGE PUBLIQUE */}
+      <div style={{ background: '#e8f5f1', borderRadius: '12px', padding: '12px 16px', border: '1px solid rgba(34,129,106,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+        <div>
+          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#22816a', marginBottom: '2px' }}>🌐 Votre page publique</div>
+          <div style={{ fontSize: '0.72rem', color: '#4a8a70' }}>Partagez ce lien à vos patients</div>
+        </div>
+        <button onClick={() => window.open(`/medecin/${profil.id}`, '_blank')} style={{ padding: '7px 14px', borderRadius: '8px', background: '#22816a', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600, fontSize: '0.78rem', whiteSpace: 'nowrap' }}>
+          Voir ma page →
+        </button>
+      </div>
+
       <div style={{ height: '1px', background: '#f0ece2' }} />
+
+      <div><label style={labelStyle}>Photo de profil</label><AvatarUpload userId={profil.id} currentUrl={avatarUrl} supabase={supabase} role="medecin" onUpload={(url: string) => setAvatarUrl(url)} /></div>
+
+      <div style={{ height: '1px', background: '#f0ece2' }} />
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         <div><label style={labelStyle}>Prénom</label><input name="prenom" value={form.prenom} onChange={handleChange} style={inputStyle} /></div>
         <div><label style={labelStyle}>Nom</label><input name="nom" value={form.nom} onChange={handleChange} style={inputStyle} /></div>
       </div>
-      <div><label style={labelStyle}>Téléphone</label><input name="telephone" value={form.telephone} onChange={handleChange} placeholder="038 08 162 55" style={inputStyle} /></div>
-      <div><label style={labelStyle}>Spécialité</label><select name="specialite" value={form.specialite} onChange={handleChange} style={inputStyle}><option value="">Choisir une spécialité</option>{SPECIALITES.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
-      <div><label style={labelStyle}>Ville / Région</label><select name="region" value={form.region} onChange={handleChange} style={inputStyle}><option value="">Choisir une ville</option>{REGIONS.map(r => <option key={r} value={r}>{r}</option>)}</select></div>
+      <div><label style={labelStyle}>Téléphone</label><input name="telephone" value={form.telephone} onChange={handleChange} placeholder="034 XX XXX XX" style={inputStyle} /></div>
+
+      <div>
+        <label style={labelStyle}>Spécialité</label>
+        <select name="specialite" value={form.specialite} onChange={handleChange} style={inputStyle}>
+          <option value="">— Choisir une spécialité —</option>
+          {SPECIALITES.map(g => (
+            <optgroup key={g.groupe} label={g.groupe}>
+              {g.items.map(s => <option key={s} value={s}>{s}</option>)}
+            </optgroup>
+          ))}
+        </select>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div>
+          <label style={labelStyle}>Ville / Région</label>
+          <select name="region" value={form.region} onChange={handleChange} style={inputStyle}>
+            <option value="">Choisir une ville</option>
+            {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+        <div><label style={labelStyle}>Tarif consultation (Ar)</label><input name="tarif" type="number" value={form.tarif} onChange={handleChange} placeholder="Ex: 40000" style={inputStyle} /></div>
+      </div>
+
       <div>
         <label style={labelStyle}>Adresse exacte du cabinet</label>
         <input name="adresse" value={form.adresse} onChange={handleChange} placeholder="Ex: Rue Pasteur, Faravohitra" style={inputStyle} />
         <div style={{ fontSize: '0.72rem', color: '#a8a090', marginTop: '5px' }}>Plus l'adresse est précise, mieux les patients vous trouveront</div>
       </div>
-      <div><label style={labelStyle}>Tarif consultation (Ar)</label><input name="tarif" type="number" value={form.tarif} onChange={handleChange} placeholder="Ex: 40000" style={inputStyle} /></div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        <div>
+          <label style={labelStyle}>Années d'expérience</label>
+          <input name="experience_annees" type="number" value={form.experience_annees} onChange={handleChange} placeholder="Ex: 10" style={inputStyle} min={0} />
+        </div>
+        <div>
+          <label style={labelStyle}>Langues parlées</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
+            {LANGUES_DISPONIBLES.map(l => (
+              <div key={l} onClick={() => toggleLangue(l)} style={{ padding: '5px 12px', borderRadius: '50px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, background: form.langues.includes(l) ? '#22816a' : '#f0ece2', color: form.langues.includes(l) ? 'white' : '#7a7260', border: `1.5px solid ${form.langues.includes(l) ? '#22816a' : '#f0ece2'}` }}>
+                {l}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label style={labelStyle}>Formation / Diplômes</label>
+        <textarea name="formation" value={form.formation} onChange={handleChange} rows={3} placeholder="Ex: Doctorat en médecine, Université d'Antananarivo (2010)…" style={{ ...inputStyle, resize: 'vertical' }} />
+      </div>
+
       <div>
         <label style={labelStyle}>Présentation du cabinet</label>
-        <textarea name="presentation" value={form.presentation} onChange={handleChange} rows={4} placeholder="Décrivez votre cabinet, votre expérience…" style={{ ...inputStyle, resize: 'vertical' }} />
+        <textarea name="presentation" value={form.presentation} onChange={handleChange} rows={4} placeholder="Décrivez votre cabinet, votre approche, votre expérience…" style={{ ...inputStyle, resize: 'vertical' }} />
       </div>
-      <button onClick={save} disabled={saving} style={{ padding: '10px 22px', borderRadius: '10px', background: saved ? '#22816a' : saving ? '#cfc5ae' : '#0d2b22', color: 'white', border: 'none', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600, fontSize: '0.85rem' }}>
+
+      <button onClick={save} disabled={saving} style={{ padding: '11px 22px', borderRadius: '10px', background: saved ? '#22816a' : saving ? '#cfc5ae' : '#0d2b22', color: 'white', border: 'none', cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600, fontSize: '0.88rem' }}>
         {saving ? '⏳ Enregistrement…' : saved ? '✅ Sauvegardé !' : 'Enregistrer les modifications'}
       </button>
+
       {geoStatus && (
         <div style={{ padding: '10px 14px', borderRadius: '10px', fontSize: '0.78rem', fontWeight: 500, background: geoStatus.startsWith('✅') ? '#e8f5f1' : '#fdf8ec', color: geoStatus.startsWith('✅') ? '#22816a' : '#c8992a', border: `1px solid ${geoStatus.startsWith('✅') ? 'rgba(34,129,106,0.2)' : 'rgba(200,153,42,0.2)'}` }}>
           {geoStatus}
