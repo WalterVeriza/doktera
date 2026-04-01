@@ -394,7 +394,7 @@ export default function LandingPage() {
         borderTop: '1px solid rgba(255,255,255,0.07)',
       }}>
         <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', fontWeight: 600, color: 'white' }}>
-          Dokt<em style={{ color: '#2eb592' }}>éra</em>
+          Rad<em style={{ color: '#2eb592' }}>oko</em>
         </div>
         <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>© 2026 Radoko · Madagascar</div>
         <div style={{ display: 'flex', gap: isMobile ? '16px' : '24px', flexWrap: 'wrap' }}>

@@ -330,7 +330,7 @@ export default function PageClinique({ params }: { params: Promise<{ id: string 
       {/* NAV */}
       <nav style={{ background: '#0d2b22', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <a href="/" style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 600, color: 'white', textDecoration: 'none', letterSpacing: '-0.02em' }}>
-          Dokt<em style={{ color: '#2eb592' }}>éra</em>
+          Rad<em style={{ color: '#2eb592' }}>oko</em>
         </a>
         {user ? (
           <a href="/dashboard/patient" style={{ padding: '8px 18px', borderRadius: '10px', background: 'rgba(255,255,255,0.1)', color: 'white', textDecoration: 'none', fontSize: '0.82rem', fontWeight: 600 }}>

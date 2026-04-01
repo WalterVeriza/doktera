@@ -117,7 +117,7 @@ export default function UpgradePage() {
       <div style={{ background: '#0d2b22', padding: isMobile ? '16px 20px' : '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div onClick={() => role === 'clinique' ? router.push('/dashboard/clinique') : router.push('/dashboard/medecin')}
           style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? '1.5rem' : '1.8rem', fontWeight: 600, color: 'white', letterSpacing: '-0.02em', cursor: 'pointer' }}>
-          Dokt<em style={{ color: '#2eb592' }}>éra</em>
+          Rad<em style={{ color: '#2eb592' }}>oko</em>
         </div>
         <div onClick={() => role === 'clinique' ? router.push('/dashboard/clinique') : router.push('/dashboard/medecin')}
           style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>

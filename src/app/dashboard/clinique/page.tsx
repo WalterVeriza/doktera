@@ -166,7 +166,7 @@ export default function DashboardClinique() {
         }}>
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 80% 0%, rgba(34,129,106,0.15) 0%, transparent 50%)', pointerEvents: 'none' }} />
           <div onClick={() => setPage('vue')} style={{ padding: '28px 24px 20px', borderBottom: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer' }}>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', fontWeight: 600, color: 'white', letterSpacing: '-0.02em' }}>Dokt<em style={{ color: '#2eb592' }}>éra</em></div>
+            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', fontWeight: 600, color: 'white', letterSpacing: '-0.02em' }}>Rad<em style={{ color: '#2eb592' }}>oko</em></div>
           </div>
           <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

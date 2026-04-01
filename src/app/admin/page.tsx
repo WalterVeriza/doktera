@@ -246,7 +246,7 @@ export default function AdminPage() {
     <div style={{ minHeight: '100vh', background: '#0d2b22', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Outfit, sans-serif' }}>
       <div style={{ background: 'white', borderRadius: '20px', padding: '40px', width: '100%', maxWidth: '400px', boxShadow: '0 24px 80px rgba(0,0,0,0.3)' }}>
         <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', fontWeight: 600, color: '#0d2b22', marginBottom: '4px' }}>
-          Dokt<em style={{ color: '#2eb592' }}>éra</em>
+          Rad<em style={{ color: '#2eb592' }}>oko</em>
         </div>
         <div style={{ fontSize: '0.75rem', color: '#a8a090', marginBottom: '28px' }}>Dashboard Administrateur</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -282,7 +282,7 @@ export default function AdminPage() {
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Outfit, sans-serif' }}>
       <nav style={{ width: '240px', minHeight: '100vh', background: '#0d2b22', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '28px 24px 20px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 600, color: 'white' }}>Dokt<em style={{ color: '#2eb592' }}>éra</em></div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 600, color: 'white' }}>Rad<em style={{ color: '#2eb592' }}>oko</em></div>
           <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', marginTop: '3px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Super Admin</div>
         </div>
         <div style={{ padding: '12px 0', flex: 1 }}>
