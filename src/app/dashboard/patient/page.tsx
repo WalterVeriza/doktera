@@ -416,7 +416,7 @@ export default function DashboardPatient() {
         if (rdvSuivant) suiviDejaReserves.add(rdvT.id)
       }
       setProfil(p); setRdvs(r || []); setRdvsClinique(rc || []); setNotifications(n || []); setAvisExistants(avisMap); setSuiviLances(suiviDejaReserves); setLoading(false)
-      supabase.channel('notifs-patient').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload) => { setNotifications(prev => [payload.new, ...prev]) }).subscribe()
+      supabase.channel('notifs-patient').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload: any) => { setNotifications(prev => [payload.new, ...prev]) }).subscribe()
     }
     load()
     return () => { supabase.removeAllChannels() }
