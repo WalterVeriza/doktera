@@ -66,10 +66,10 @@ export default function DashboardClinique() {
       setLoading(false)
 
       supabase.channel('dashboard-clinique')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload) => {
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload: any) => {
           setNotifications(prev => [payload.new, ...prev])
         })
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cliniques', filter: `admin_id=eq.${user.id}` }, (payload) => {
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cliniques', filter: `admin_id=eq.${user.id}` }, (payload: any) => {
           const updated = payload.new as any
           setPlanActif(updated.plan_actif === true)
           setClinique((prev: any) => ({ ...prev, ...updated }))
