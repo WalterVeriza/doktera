@@ -185,7 +185,7 @@ function AvisSection({ avis, loading, noteMoyenne, nombreAvis }: { avis: any[], 
   )
 }
 
-function PanelClinique({ clinique, onClose, isMobile }: any) {
+function PanelClinique({ clinique, onClose, isMobile, router }: any) {
   const panelRef = useRef<HTMLDivElement>(null)
   const ICONS: Record<string, string> = { consultation: '🩺', hospitalisation: '🛏️', maternite: '🤱', imagerie: '🔬', laboratoire: '🧪', chirurgie: '⚕️', urgences: '🚨' }
   const services = clinique._services || []
@@ -237,7 +237,7 @@ function PanelClinique({ clinique, onClose, isMobile }: any) {
           )}
         </div>
         <div style={{ padding: '16px 24px', borderTop: '1px solid #f0ece2', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <button onClick={() => window.open('/clinique/' + clinique.id, '_blank')} style={{ padding: '11px', borderRadius: '10px', background: '#22816a', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', fontFamily: 'Outfit, sans-serif' }}>Voir la page et réserver</button>
+          <button onClick={() => router.push('/clinique/' + clinique.id)} style={{ padding: '11px', borderRadius: '10px', background: '#22816a', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', fontFamily: 'Outfit, sans-serif' }}>Voir la page et réserver</button>
           <button onClick={onClose} style={{ padding: '11px', borderRadius: '10px', background: '#f0ece2', color: '#0d2b22', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'Outfit, sans-serif' }}>Fermer</button>
         </div>
       </div>
@@ -449,7 +449,7 @@ export default function RecherchePage() {
   return (
     <div style={{ minHeight: '100vh', background: '#faf8f4', fontFamily: 'Outfit, sans-serif' }}>
       {renderPanel()}
-      {cliniquePanel && <PanelClinique clinique={cliniquePanel} onClose={() => setCliniquePanel(null)} isMobile={isMobile} />}
+      {cliniquePanel && <PanelClinique clinique={cliniquePanel} onClose={() => setCliniquePanel(null)} isMobile={isMobile} router={router} />}
 
       {/* HEADER */}
       <div style={{ background: '#0d2b22', padding: isMobile ? '14px 16px' : '20px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100, gap: '12px' }}>
