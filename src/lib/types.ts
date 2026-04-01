@@ -8,6 +8,7 @@ export interface Profil {
   prenom: string
   nom: string
   telephone?: string
+  avatar_url?: string
   created_at: string
 }
 
