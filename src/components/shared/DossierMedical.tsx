@@ -160,7 +160,7 @@ export default function DossierMedical({ patientId, supabase, isMedecin = false,
       <div style={{ display: 'flex', gap: '8px' }}>
         {tabs.map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-            padding: '8px 18px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+            padding: '8px 18px', borderRadius: '10px', cursor: 'pointer',
             fontFamily: 'Outfit, sans-serif', fontSize: '0.82rem', fontWeight: 600,
             background: activeTab === tab.id ? '#0d2b22' : 'white',
             color: activeTab === tab.id ? 'white' : '#7a7260',
