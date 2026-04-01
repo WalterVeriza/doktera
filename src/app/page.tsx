@@ -38,7 +38,7 @@ export default function LandingPage() {
         borderBottom: '1px solid rgba(13,43,34,0.06)',
       }}>
         <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? '1.5rem' : '1.7rem', fontWeight: 600, color: '#0d2b22', letterSpacing: '-0.02em' }}>
-          Dokt<em style={{ color: '#22816a' }}>éra</em>
+          Rad<em style={{ color: '#22816a' }}>oko</em>
         </div>
 
         {!isMobile && (
@@ -104,7 +104,7 @@ export default function LandingPage() {
               La santé,<br /><em style={{ color: '#2eb592' }}>accessible</em><br />à tous.
             </h1>
             <p style={{ fontSize: isMobile ? '0.95rem' : '1.05rem', lineHeight: 1.65, color: 'rgba(255,255,255,0.6)', marginBottom: '40px', maxWidth: '500px', fontWeight: 300, margin: isMobile ? '0 auto 40px' : '0 0 40px' }}>
-              Doktéra connecte patients, médecins et cliniques à Madagascar. Trouvez un praticien, réservez un créneau, consultez — en moins de 2 minutes.
+              Radoko connecte patients, médecins et cliniques à Madagascar. Trouvez un praticien, réservez un créneau, consultez — en moins de 2 minutes.
             </p>
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', justifyContent: isMobile ? 'center' : 'flex-start' }}>
               <Link href="/recherche" style={{ padding: '14px 32px', borderRadius: '10px', background: '#2eb592', color: '#0d2b22', fontSize: '0.95rem', fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 20px rgba(46,181,146,0.35)' }}>
@@ -171,7 +171,7 @@ export default function LandingPage() {
             Accéder à un médecin<br />ne devrait pas être un combat.
           </h2>
           <p style={{ fontSize: '1rem', color: '#7a7260', maxWidth: '520px', lineHeight: 1.65, fontWeight: 300, marginBottom: '48px' }}>
-            À Madagascar, le système de santé manque cruellement d'outils modernes. Doktéra est là pour changer ça.
+            À Madagascar, le système de santé manque cruellement d'outils modernes. Radoko est là pour changer ça.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1px', background: '#e8e0cc', borderRadius: '16px', overflow: 'hidden', border: '1px solid #e8e0cc' }}>
             {[
@@ -276,7 +276,7 @@ export default function LandingPage() {
             Gratuit pour les patients.<br />Simple pour les pros.
           </h2>
           <p style={{ fontSize: '1rem', color: '#7a7260', marginBottom: '48px', fontWeight: 300 }}>
-            Les patients accèdent à Doktéra sans frais. Paiement via MVola ou Orange Money.
+            Les patients accèdent à Radoko sans frais. Paiement via MVola ou Orange Money.
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : isTablet ? '1fr 1fr' : 'repeat(3, 1fr)', gap: '20px', alignItems: 'start' }}>
             {[
@@ -355,7 +355,7 @@ export default function LandingPage() {
             Que vous soyez patient, médecin ou clinique, notre équipe est disponible pour vous accompagner.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center' }}>
-            <a href="mailto:walterveriza@gmail.com" style={{
+            <a href="mailto:radoko.mg@gmail.com" style={{
               display: 'flex', alignItems: 'center', gap: '14px',
               background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: '14px', padding: '16px 24px', width: '100%', maxWidth: '400px',
@@ -364,7 +364,7 @@ export default function LandingPage() {
               <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'rgba(46,181,146,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>✉️</div>
               <div style={{ textAlign: 'left' }}>
                 <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '3px' }}>Email</div>
-                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'white' }}>walterveriza@gmail.com</div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'white' }}>radoko.mg@gmail.com</div>
               </div>
             </a>
             <a href="https://wa.me/261327231486" target="_blank" rel="noopener noreferrer" style={{
@@ -396,9 +396,9 @@ export default function LandingPage() {
         <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.4rem', fontWeight: 600, color: 'white' }}>
           Dokt<em style={{ color: '#2eb592' }}>éra</em>
         </div>
-        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>© 2026 Doktéra · Madagascar</div>
+        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>© 2026 Radoko · Madagascar</div>
         <div style={{ display: 'flex', gap: isMobile ? '16px' : '24px', flexWrap: 'wrap' }}>
-          <a href="mailto:walterveriza@gmail.com" style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>walterveriza@gmail.com</a>
+          <a href="mailto:radoko.mg@gmail.com" style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>radoko.mg@gmail.com</a>
           <a href="https://wa.me/261327231486" target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>WhatsApp</a>
         </div>
       </footer>

@@ -36,8 +36,8 @@ const PLAN_CLINIQUE = {
 }
 
 const MOYENS_PAIEMENT = [
-  { id: 'mvola', nom: 'MVola', logo: '📱', numero: '034 XX XXX XX', nom_compte: 'DOKTERA SAS', couleur: '#e8174a' },
-  { id: 'orange_money', nom: 'Orange Money', logo: '🟠', numero: '032 XX XXX XX', nom_compte: 'DOKTERA SAS', couleur: '#ff6900' },
+  { id: 'mvola', nom: 'MVola', logo: '📱', numero: '038 08 162 55', nom_compte: 'Walter Hélène Aimé', couleur: '#e8174a' },
+  { id: 'orange_money', nom: 'Orange Money', logo: '🟠', numero: '032 72 314 96', nom_compte: 'Walter Hélène Aimé', couleur: '#ff6900' },
 ]
 
 export default function UpgradePage() {

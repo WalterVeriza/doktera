@@ -532,7 +532,7 @@ export default function RecherchePage() {
 
       <div style={{ background: '#0d2b22', padding: '20px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
         <div onClick={() => router.push('/')} style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.8rem', fontWeight: 600, color: 'white', cursor: 'pointer' }}>
-          Doktéra
+          Radoko
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           {user ? (

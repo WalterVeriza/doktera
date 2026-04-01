@@ -920,7 +920,7 @@ function ProfilForm({ profil, medecin, supabase, onSaved }: any) {
     if (form.adresse) {
       setGeoStatus('Géolocalisation en cours…')
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(`${form.adresse}, ${form.region}, Madagascar`)}&format=json&limit=1`, { headers: { 'Accept-Language': 'fr', 'User-Agent': 'Doktera/1.0' } })
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(`${form.adresse}, ${form.region}, Madagascar`)}&format=json&limit=1`, { headers: { 'Accept-Language': 'fr', 'User-Agent': 'Radoko/1.0' } })
         const data = await res.json()
         if (data.length > 0) {
           await supabase.from('medecins').update({ latitude: parseFloat(data[0].lat), longitude: parseFloat(data[0].lon) }).eq('id', profil.id)
@@ -941,7 +941,7 @@ function ProfilForm({ profil, medecin, supabase, onSaved }: any) {
         <div><label style={labelStyle}>Prénom</label><input name="prenom" value={form.prenom} onChange={handleChange} style={inputStyle} /></div>
         <div><label style={labelStyle}>Nom</label><input name="nom" value={form.nom} onChange={handleChange} style={inputStyle} /></div>
       </div>
-      <div><label style={labelStyle}>Téléphone</label><input name="telephone" value={form.telephone} onChange={handleChange} placeholder="034 XX XXX XX" style={inputStyle} /></div>
+      <div><label style={labelStyle}>Téléphone</label><input name="telephone" value={form.telephone} onChange={handleChange} placeholder="038 08 162 55" style={inputStyle} /></div>
       <div><label style={labelStyle}>Spécialité</label><select name="specialite" value={form.specialite} onChange={handleChange} style={inputStyle}><option value="">Choisir une spécialité</option>{SPECIALITES.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
       <div><label style={labelStyle}>Ville / Région</label><select name="region" value={form.region} onChange={handleChange} style={inputStyle}><option value="">Choisir une ville</option>{REGIONS.map(r => <option key={r} value={r}>{r}</option>)}</select></div>
       <div>

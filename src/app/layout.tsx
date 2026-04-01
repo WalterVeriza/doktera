@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Doktéra — Santé à portée de main',
+  title: 'Radoko — Santé à portée de main',
   description: 'La première plateforme médicale de Madagascar. Trouvez un médecin, réservez un créneau en 2 minutes.',
 }
 

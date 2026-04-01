@@ -141,7 +141,7 @@ export default function LoginPage() {
         {/* LOGO */}
         <div style={{ marginBottom: '28px' }}>
           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? '2.2rem' : '2.8rem', fontWeight: 600, color: '#0d2b22', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: '6px' }}>
-            Dokt<em style={{ color: '#22816a' }}>éra</em>
+            Rad<em style={{ color: '#22816a' }}>oko</em>
           </div>
           <div style={{ fontSize: '0.82rem', color: '#7a7260' }}>Santé à portée de main — Madagascar 🇲🇬</div>
         </div>
@@ -203,7 +203,7 @@ export default function LoginPage() {
                   <input name="nom" placeholder="Nom" value={form.nom} onChange={handleChange} style={inputStyle} />
                 </div>
               )}
-              <input name="telephone" placeholder="Téléphone (034 XX XXX XX)" value={form.telephone} onChange={handleChange} style={inputStyle} />
+              <input name="telephone" placeholder="Téléphone (038 08 162 55)" value={form.telephone} onChange={handleChange} style={inputStyle} />
 
               {role === 'medecin' && (
                 <select name="specialite" value={form.specialite} onChange={handleChange} style={{ ...inputStyle, color: form.specialite ? '#1a1512' : '#a8a090' }}>

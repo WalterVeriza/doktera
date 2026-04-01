@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 
-const ADMIN_EMAIL = 'walterveriza@gmail.com'
-const ADMIN_PASSWORD = 'DokteraAdmin2025!'
+const ADMIN_EMAIL = 'radoko.mg@gmail.com'
+const ADMIN_PASSWORD = 'RadokoAdmin2025!'
 
 const SUPABASE_URL = 'https://ihgiatyybqghkjbpbumy.supabase.co'
 const SUPABASE_SERVICE_KEY = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!
@@ -384,7 +384,7 @@ function GestionPaiements({ supabase }: any) {
     await supabase.from('notifications').insert({
       user_id: paiement.user_id, type: 'rdv_annule',
       titre: '❌ Paiement refusé',
-      corps: `Votre demande de paiement pour le plan ${paiement.plan} n'a pas pu être validée. Contactez-nous à contact@doktera.mg.`,
+      corps: `Votre demande de paiement pour le plan ${paiement.plan} n'a pas pu être validée. Contactez-nous à radoko.mg@gmail.com.`,
       lu: false,
     })
     load(); setActionLoading(null)
