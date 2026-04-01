@@ -70,8 +70,8 @@ async function genererCreneauxDisponibles(
     .gte('date_creneau', debutJour)
     .lte('date_creneau', finJour)
 
-  const heuresPrises = new Set((rdvsPris || []).map((r: any) => r.heure?.slice(0, 5)))
-  const heuresBloqueesManuel = new Set(
+  const heuresPrises = new Set<string>((rdvsPris || []).map((r: any) => r.heure?.slice(0, 5) as string))
+  const heuresBloqueesManuel = new Set<string>(
     (blocagesManuels || []).map((b: any) => {
       const d = new Date(b.date_creneau)
       return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
