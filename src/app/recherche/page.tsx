@@ -353,7 +353,8 @@ export default function RecherchePage() {
       resultsMedecins = resultsMedecins.filter((m: any) =>
         (m.profil?.prenom + ' ' + m.profil?.nom).toLowerCase().includes(txtLower) ||
         m.specialite?.toLowerCase().includes(txtLower) ||
-        m.adresse?.toLowerCase().includes(txtLower)
+        m.adresse?.toLowerCase().includes(txtLower) ||
+        m.region?.toLowerCase().includes(txtLower)
       )
 
       resultsCliniques = resultsCliniques.filter((c: any) => {
