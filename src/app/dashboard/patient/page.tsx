@@ -1013,7 +1013,7 @@ export default function DashboardPatient() {
                             </div>
                             <span style={{ padding: '3px 10px', borderRadius: '50px', background: s.bg, color: s.color, fontSize: '0.68rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
                             {(rdv.statut === 'en_attente' || rdv.statut === 'confirme') && (
-                              <button onClick={() => setModalAnnulation({ rdv, type: 'clinique' })}) style={{ padding: '5px 10px', borderRadius: '8px', background: '#fdf0ee', color: '#c0392b', border: 'none', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Annuler</button>
+                              <button onClick={() => setModalAnnulation({ rdv, type: 'clinique' })} style={{ padding: '5px 10px', borderRadius: '8px', background: '#fdf0ee', color: '#c0392b', border: 'none', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Annuler</button>
                             )}
                           </div>
                         </div>
