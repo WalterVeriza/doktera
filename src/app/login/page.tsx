@@ -67,6 +67,7 @@ export default function LoginPage() {
       } else {
         if (!role) { setError('Choisissez votre rôle'); setLoading(false); return }
         if (!cguAcceptees) { setError('Vous devez accepter les CGU pour continuer'); setLoading(false); return }
+        setError('')
 
         const { data, error } = await supabase.auth.signUp({ email: form.email, password: form.password })
         if (error) throw error
