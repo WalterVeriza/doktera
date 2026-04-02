@@ -669,6 +669,29 @@ function ModalConsultation({ rdv, onClose, onSubmit, isMobile }: any) {
 function Analytics({ rdvs, tarif, onGoToProfil, isMobile, isTablet }: { rdvs: any[], tarif: number, onGoToProfil: () => void, isMobile: boolean, isTablet: boolean }) {
   const [periode, setPeriode] = useState<'3m' | '6m' | '12m'>('6m')
   const now = new Date()
+
+  // Sélecteur de mois spécifique — par défaut le mois actuel
+  const moisActuelKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  const [moisSelectionne, setMoisSelectionne] = useState(moisActuelKey)
+
+  // Générer la liste des 24 derniers mois pour le sélecteur
+  const listeMois = Array.from({ length: 24 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const label = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+    return { key, label }
+  })
+
+  // Stats du mois sélectionné
+  const rdvMoisSelectionne = rdvs.filter(r => {
+    const d = new Date(r.date_rdv)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` === moisSelectionne
+  })
+  const terminesMoisSel = rdvMoisSelectionne.filter(r => r.statut === 'termine')
+  const annulesMoisSel = rdvMoisSelectionne.filter(r => r.statut === 'annule')
+  const revenuMoisSel = terminesMoisSel.length * tarif
+  const labelMoisSel = listeMois.find(m => m.key === moisSelectionne)?.label || moisSelectionne
+
   const moisCount = periode === '3m' ? 3 : periode === '6m' ? 6 : 12
   const mois = Array.from({ length: moisCount }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - (moisCount - 1 - i), 1)
@@ -680,7 +703,6 @@ function Analytics({ rdvs, tarif, onGoToProfil, isMobile, isTablet }: { rdvs: an
     const terminesDuMois = rdvDuMois.filter(r => r.statut === 'termine')
     return { mois: m.label, rdvs: rdvDuMois.length, termines: terminesDuMois.length, annules: rdvDuMois.filter(r => r.statut === 'annule').length, revenus: terminesDuMois.length * tarif }
   })
-  const moisActuelKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
   const rdvCeMois = rdvs.filter(r => { const d = new Date(r.date_rdv); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` === moisActuelKey })
   const revenuCeMois = rdvCeMois.filter(r => r.statut === 'termine').length * tarif
   const revenuTotal = rdvTermines.length * tarif
@@ -695,6 +717,14 @@ function Analytics({ rdvs, tarif, onGoToProfil, isMobile, isTablet }: { rdvs: an
     { name: 'En attente', value: rdvs.filter(r => r.statut === 'en_attente').length, color: '#c8992a' },
     { name: 'Annulés', value: rdvs.filter(r => r.statut === 'annule').length, color: '#c0392b' },
   ].filter(d => d.value > 0)
+
+  // Meilleur jour de la semaine
+  const JOURS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+  const parJour = [0, 1, 2, 3, 4, 5, 6].map(j => ({
+    jour: JOURS[j].slice(0, 3),
+    count: rdvs.filter(r => new Date(r.date_rdv).getDay() === j && r.statut === 'termine').length
+  })).filter(j => j.jour !== 'Dim')
+  const maxJour = Math.max(...parJour.map(j => j.count), 1)
 
   const cardStyle: React.CSSProperties = { background: 'white', borderRadius: '16px', padding: isMobile ? '16px' : '22px', border: '1px solid #f0ece2' }
   const titleStyle: React.CSSProperties = { fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontWeight: 600, color: '#0d2b22', marginBottom: '16px' }
@@ -711,6 +741,61 @@ function Analytics({ rdvs, tarif, onGoToProfil, isMobile, isTablet }: { rdvs: an
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+      {/* DÉTAIL PAR MOIS SÉLECTIONNÉ */}
+      <div style={{ ...cardStyle, background: 'linear-gradient(135deg, #0d2b22, #163d2f)', border: 'none' }}>
+        <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: '12px', marginBottom: '20px' }}>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? '1.1rem' : '1.2rem', fontWeight: 600, color: 'white' }}>
+            📅 Détail du mois
+          </div>
+          <select value={moisSelectionne} onChange={e => setMoisSelectionne(e.target.value)}
+            style={{ padding: '8px 14px', borderRadius: '10px', border: 'none', background: 'rgba(255,255,255,0.12)', color: 'white', fontFamily: 'Outfit, sans-serif', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}>
+            {listeMois.map(m => (
+              <option key={m.key} value={m.key} style={{ background: '#0d2b22', color: 'white' }}>{m.label}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: '12px' }}>
+          {[
+            { label: 'Revenus', value: `${revenuMoisSel.toLocaleString()} Ar`, icon: '💰', color: '#2eb592' },
+            { label: 'Consultations', value: terminesMoisSel.length, icon: '✅', color: '#2eb592' },
+            { label: 'Total RDV', value: rdvMoisSelectionne.length, icon: '📅', color: 'rgba(255,255,255,0.6)' },
+            { label: 'Annulés', value: annulesMoisSel.length, icon: '❌', color: annulesMoisSel.length > 0 ? '#e6b84a' : 'rgba(255,255,255,0.4)' },
+          ].map(stat => (
+            <div key={stat.label} style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '12px', padding: '14px 16px', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.45)', marginBottom: '6px' }}>{stat.label}</div>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? '1.3rem' : '1.6rem', fontWeight: 600, color: stat.color, lineHeight: 1 }}>{stat.value}</div>
+            </div>
+          ))}
+        </div>
+        {rdvMoisSelectionne.length > 0 && (
+          <div style={{ marginTop: '16px', padding: '12px 16px', background: 'rgba(255,255,255,0.06)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>RDV de {labelMoisSel}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '200px', overflowY: 'auto' }}>
+              {rdvMoisSelectionne.sort((a: any, b: any) => new Date(a.date_rdv).getTime() - new Date(b.date_rdv).getTime()).map((rdv: any) => {
+                const statusColors: Record<string, string> = { termine: '#2eb592', confirme: '#e6b84a', en_attente: 'rgba(255,255,255,0.4)', annule: '#e07070' }
+                const statusLabels: Record<string, string> = { termine: '✅', confirme: '⏳', en_attente: '🕐', annule: '❌' }
+                return (
+                  <div key={rdv.id} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <span style={{ fontSize: '0.85rem' }}>{statusLabels[rdv.statut] || '🕐'}</span>
+                    <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.7)', flex: 1 }}>
+                      {rdv.patient?.profil?.prenom} {rdv.patient?.profil?.nom}
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)' }}>
+                      {new Date(rdv.date_rdv).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                    </span>
+                    {rdv.statut === 'termine' && tarif > 0 && (
+                      <span style={{ fontSize: '0.72rem', color: '#2eb592', fontWeight: 700 }}>{tarif.toLocaleString()} Ar</span>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* VUE GLOBALE */}
       <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'space-between', flexDirection: isMobile ? 'column' : 'row', gap: '12px' }}>
         <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? '1.1rem' : '1.2rem', fontWeight: 600, color: '#0d2b22' }}>Vue d'ensemble — {tarif.toLocaleString()} Ar / consultation</div>
         <div style={{ display: 'flex', gap: '6px', background: 'white', padding: '4px', borderRadius: '10px', border: '1px solid #f0ece2' }}>
@@ -787,6 +872,26 @@ function Analytics({ rdvs, tarif, onGoToProfil, isMobile, isTablet }: { rdvs: an
           )}
         </div>
       </div>
+
+      {/* MEILLEUR JOUR DE LA SEMAINE */}
+      <div style={cardStyle}>
+        <div style={titleStyle}>📆 Activité par jour de la semaine</div>
+        <div style={{ display: 'flex', gap: isMobile ? '6px' : '10px', alignItems: 'flex-end', height: '80px' }}>
+          {parJour.map(j => (
+            <div key={j.jour} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+              <div style={{ fontSize: '0.65rem', color: '#22816a', fontWeight: 700 }}>{j.count > 0 ? j.count : ''}</div>
+              <div style={{ width: '100%', background: j.count === maxJour && j.count > 0 ? '#22816a' : j.count > 0 ? '#e8f5f1' : '#f0ece2', borderRadius: '6px 6px 0 0', height: `${Math.max((j.count / maxJour) * 56, j.count > 0 ? 8 : 4)}px`, transition: 'height 0.3s', border: j.count === maxJour && j.count > 0 ? 'none' : '1px solid #f0ece2' }} />
+              <div style={{ fontSize: '0.68rem', color: j.count === maxJour && j.count > 0 ? '#22816a' : '#a8a090', fontWeight: j.count === maxJour && j.count > 0 ? 700 : 400 }}>{j.jour}</div>
+            </div>
+          ))}
+        </div>
+        {maxJour > 0 && (
+          <div style={{ marginTop: '12px', fontSize: '0.78rem', color: '#7a7260', background: '#faf8f4', padding: '8px 12px', borderRadius: '8px' }}>
+            💡 Votre journée la plus active est le <strong style={{ color: '#22816a' }}>{parJour.find(j => j.count === maxJour)?.jour}</strong>
+          </div>
+        )}
+      </div>
+
       {topMotifs.length > 0 && (
         <div style={cardStyle}>
           <div style={titleStyle}>🩺 Top motifs</div>
