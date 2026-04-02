@@ -73,7 +73,7 @@ export default function UpgradePage() {
           setPlanActuel(cl.plan_actif ? 'clinic' : null)
         } else {
           setRole('medecin')
-          setPlanActuel(med?.plan || null)
+          setPlanActuel(med?.plan_actif ? (med?.plan || null) : null)
         }
       }
       setLoading(false)
