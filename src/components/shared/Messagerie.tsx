@@ -533,6 +533,12 @@ export default function Messagerie({ currentUserId, supabase, role = 'patient', 
                   📅 Prendre un rendez-vous
                 </button>
               )}
+              {isMedecinPanel && role === 'patient' && (
+                <button onClick={() => window.open(`/medecin/${p.id}`, '_self')}
+                  style={{ padding: '11px', borderRadius: '10px', background: '#faf8f4', color: '#0d2b22', border: '1px solid #f0ece2', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'Outfit, sans-serif' }}>
+                  Voir la page complète →
+                </button>
+              )}
               {!isMedecinPanel && hasPro && (
                 <button
                   onClick={() => {
