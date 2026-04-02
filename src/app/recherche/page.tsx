@@ -34,6 +34,15 @@ const CATEGORIES_CLINIQUE = [
   { id: 'urgences', label: 'Urgences', keywords: ['urgence', 'urgences'] },
 ]
 
+const REGIONS_MADAGASCAR = [
+  'Toutes les régions',
+  'Analamanga', 'Vakinankaratra', 'Itasy', 'Bongolava',
+  'Matsiatra Ambony', "Amoron'i Mania", 'Vatovavy', 'Fitovinany',
+  'Atsimo-Atsinanana', 'Atsinanana', 'Analanjirofo', 'Alaotra-Mangoro',
+  'Boeny', 'Sofia', 'Betsiboka', 'Melaky',
+  'Atsimo-Andrefana', 'Androy', 'Anosy', 'Menabe', 'Diana', 'Sava',
+]
+
 function useWindowWidth() {
   const [width, setWidth] = useState(1200)
   useEffect(() => {
@@ -186,6 +195,10 @@ function AvisSection({ avis, loading, noteMoyenne, nombreAvis }: { avis: any[], 
 }
 
 function PanelClinique({ clinique, onClose, isMobile, router }: any) {
+  const [region, setRegion] = useState('Toutes les régions')
+  const [tarifMin, setTarifMin] = useState('')
+  const [tarifMax, setTarifMax] = useState('')
+  const [tri, setTri] = useState<'pertinence' | 'note' | 'tarif_asc' | 'tarif_desc' | 'distance'>('pertinence')
   const panelRef = useRef<HTMLDivElement>(null)
   const ICONS: Record<string, string> = { consultation: '🩺', hospitalisation: '🛏️', maternite: '🤱', imagerie: '🔬', laboratoire: '🧪', chirurgie: '⚕️', urgences: '🚨' }
   const services = clinique._services || []
@@ -270,6 +283,10 @@ export default function RecherchePage() {
   const [cliniquePanel, setCliniquePanel] = useState<any>(null)
   const [typeFiltre, setTypeFiltre] = useState<'tous' | 'medecins' | 'cliniques'>('tous')
   const [showFiltres, setShowFiltres] = useState(false)
+  const [region, setRegion] = useState('Toutes les régions')
+  const [tarifMin, setTarifMin] = useState('')
+  const [tarifMax, setTarifMax] = useState('')
+  const [tri, setTri] = useState<'pertinence' | 'note' | 'tarif_asc' | 'tarif_desc' | 'distance'>('pertinence')
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -374,8 +391,27 @@ export default function RecherchePage() {
       .sort((a: any, b: any) => a.distance - b.distance)
   }
 
-  const medecinsAfiltres = userPos ? addDistance(medecins) : medecins
-  const cliniquesAfiltres = userPos ? addDistance(cliniques) : cliniques
+  const appliquerFiltresEtTri = (items: any[], type: 'medecin' | 'clinique') => {
+    let result = userPos ? addDistance(items) : items
+    // Filtre région
+    if (region !== 'Toutes les régions') {
+      result = result.filter((m: any) => m.region === region)
+    }
+    // Filtre tarif (médecins uniquement)
+    if (type === 'medecin') {
+      if (tarifMin !== '') result = result.filter((m: any) => m.tarif == null || Number(m.tarif) >= Number(tarifMin))
+      if (tarifMax !== '') result = result.filter((m: any) => m.tarif == null || Number(m.tarif) <= Number(tarifMax))
+    }
+    // Tri
+    if (tri === 'note') result = [...result].sort((a, b) => (b.note_moyenne || 0) - (a.note_moyenne || 0))
+    else if (tri === 'tarif_asc') result = [...result].sort((a, b) => (a.tarif || 0) - (b.tarif || 0))
+    else if (tri === 'tarif_desc') result = [...result].sort((a, b) => (b.tarif || 0) - (a.tarif || 0))
+    else if (tri === 'distance' && userPos) result = [...result].sort((a, b) => (a.distance || 999) - (b.distance || 999))
+    return result
+  }
+
+  const medecinsAfiltres = appliquerFiltresEtTri(medecins, 'medecin')
+  const cliniquesAfiltres = appliquerFiltresEtTri(cliniques, 'clinique')
   const totalResultats = typeFiltre === 'tous'
     ? medecinsAfiltres.length + cliniquesAfiltres.length
     : typeFiltre === 'medecins' ? medecinsAfiltres.length : cliniquesAfiltres.length
@@ -505,6 +541,35 @@ export default function RecherchePage() {
             </button>
           </div>
         )}
+      </div>
+
+      {/* FILTRES AVANCÉS */}
+      <div style={{ background: '#faf8f4', borderBottom: '1px solid #f0ece2', padding: isMobile ? '12px 16px' : '14px 48px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#a8a090', textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0 }}>Filtres</span>
+          <select value={region} onChange={e => setRegion(e.target.value)} style={{ padding: '7px 12px', background: region !== 'Toutes les régions' ? '#e8f5f1' : 'white', border: region !== 'Toutes les régions' ? '1.5px solid #22816a' : '1.5px solid #f0ece2', borderRadius: '8px', fontFamily: 'Outfit, sans-serif', fontSize: '0.78rem', color: '#1a1512', outline: 'none', cursor: 'pointer' }}>
+            {REGIONS_MADAGASCAR.map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <input value={tarifMin} onChange={e => setTarifMin(e.target.value)} placeholder="Tarif min" type="number" min={0} style={{ width: '90px', padding: '7px 10px', background: 'white', border: '1.5px solid #f0ece2', borderRadius: '8px', fontFamily: 'Outfit, sans-serif', fontSize: '0.78rem', color: '#1a1512', outline: 'none' }} />
+            <span style={{ fontSize: '0.72rem', color: '#a8a090' }}>—</span>
+            <input value={tarifMax} onChange={e => setTarifMax(e.target.value)} placeholder="Tarif max" type="number" min={0} style={{ width: '90px', padding: '7px 10px', background: 'white', border: '1.5px solid #f0ece2', borderRadius: '8px', fontFamily: 'Outfit, sans-serif', fontSize: '0.78rem', color: '#1a1512', outline: 'none' }} />
+            <span style={{ fontSize: '0.72rem', color: '#a8a090' }}>Ar</span>
+          </div>
+          <select value={tri} onChange={e => setTri(e.target.value as any)} style={{ padding: '7px 12px', background: tri !== 'pertinence' ? '#e8f5f1' : 'white', border: tri !== 'pertinence' ? '1.5px solid #22816a' : '1.5px solid #f0ece2', borderRadius: '8px', fontFamily: 'Outfit, sans-serif', fontSize: '0.78rem', color: '#1a1512', outline: 'none', cursor: 'pointer' }}>
+            <option value="pertinence">Trier par pertinence</option>
+            <option value="note">⭐ Meilleure note</option>
+            <option value="tarif_asc">💰 Tarif croissant</option>
+            <option value="tarif_desc">💰 Tarif décroissant</option>
+            {userPos && <option value="distance">📍 Plus proche</option>}
+          </select>
+          {(region !== 'Toutes les régions' || tarifMin || tarifMax || tri !== 'pertinence') && (
+            <button onClick={() => { setRegion('Toutes les régions'); setTarifMin(''); setTarifMax(''); setTri('pertinence') }}
+              style={{ padding: '7px 12px', borderRadius: '8px', background: '#fdf0ee', color: '#c0392b', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}>
+              ✕ Réinitialiser
+            </button>
+          )}
+        </div>
       </div>
 
       {/* CARTE */}
