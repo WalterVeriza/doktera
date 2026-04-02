@@ -390,6 +390,8 @@ export default function DashboardPatient() {
   const [modalAvis, setModalAvis] = useState<any>(null)
   const [suiviLances, setSuiviLances] = useState<Set<string>>(new Set())
   const [cliniquePanel, setCliniquePanel] = useState<any>(null)
+  const [modalAnnulation, setModalAnnulation] = useState<any>(null)
+  const [filtreHistorique, setFiltreHistorique] = useState<'tous' | 'termine' | 'annule'>('tous')
   const [cliniquePanelLoading, setCliniquePanelLoading] = useState(false)
   const [msgCliniqueInitiale, setMsgCliniqueInitiale] = useState<any>(null)
   const notifRef = useRef<HTMLDivElement>(null)
@@ -738,6 +740,51 @@ export default function DashboardPatient() {
     <>
       {renderPanel()}
       {renderCliniquePanel()}
+      {modalAnnulation && (
+        <>
+          <div onClick={() => setModalAnnulation(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(13,43,34,0.4)', zIndex: 300, backdropFilter: 'blur(3px)' }} />
+          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: isMobile ? 'calc(100% - 32px)' : '400px', background: 'white', borderRadius: '20px', zIndex: 301, overflow: 'hidden', boxShadow: '0 24px 80px rgba(13,43,34,0.25)', fontFamily: 'Outfit, sans-serif' }}>
+            <div style={{ background: 'linear-gradient(135deg, #c0392b, #e74c3c)', padding: '20px 24px', textAlign: 'center' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '8px' }}>❌</div>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.2rem', fontWeight: 600, color: 'white' }}>Annuler ce rendez-vous ?</div>
+            </div>
+            <div style={{ padding: '24px' }}>
+              <div style={{ background: '#faf8f4', borderRadius: '12px', padding: '14px 16px', marginBottom: '20px', border: '1px solid #f0ece2' }}>
+                {modalAnnulation.type === 'medecin' ? (
+                  <>
+                    <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#0d2b22', marginBottom: '4px' }}>
+                      Dr. {modalAnnulation.rdv.medecin?.profil?.prenom} {modalAnnulation.rdv.medecin?.profil?.nom}
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#7a7260' }}>
+                      {new Date(modalAnnulation.rdv.date_rdv).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} à {new Date(modalAnnulation.rdv.date_rdv).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#0d2b22', marginBottom: '4px' }}>{modalAnnulation.rdv.clinique?.nom}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#7a7260' }}>{modalAnnulation.rdv.service?.nom} · {new Date(modalAnnulation.rdv.date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+                  </>
+                )}
+              </div>
+              <div style={{ fontSize: '0.82rem', color: '#7a7260', marginBottom: '20px', textAlign: 'center', lineHeight: 1.6 }}>
+                Cette action est irréversible. Le médecin{modalAnnulation.type === 'clinique' ? '/la clinique' : ''} sera notifié(e).
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button onClick={() => setModalAnnulation(null)} style={{ flex: 1, padding: '11px', borderRadius: '10px', background: '#f0ece2', color: '#0d2b22', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 600, fontSize: '0.88rem' }}>
+                  Garder le RDV
+                </button>
+                <button onClick={async () => {
+                  if (modalAnnulation.type === 'medecin') await annulerRdv(modalAnnulation.rdv)
+                  else await annulerRdvClinique(modalAnnulation.rdv)
+                  setModalAnnulation(null)
+                }} style={{ flex: 1, padding: '11px', borderRadius: '10px', background: '#c0392b', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.88rem' }}>
+                  Confirmer l'annulation
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
       {modalAvis && <ModalAvis rdv={modalAvis} onClose={() => setModalAvis(null)} onSubmit={(note: number, commentaire: string) => soumettreAvis(modalAvis.id, modalAvis.medecin.id, note, commentaire)} isMobile={isMobile} />}
 
       {/* OVERLAY SIDEBAR MOBILE */}
@@ -872,8 +919,8 @@ export default function DashboardPatient() {
                               <div style={{ fontSize: '0.72rem', color: '#7a7260' }}>{new Date(rdv.date_rdv).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</div>
                             </div>
                             <span style={{ padding: '3px 10px', borderRadius: '50px', background: s.bg, color: s.color, fontSize: '0.68rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
-                            {rdv.statut !== 'annule' && (
-                              <button onClick={() => annulerRdv(rdv)} style={{ padding: '5px 10px', borderRadius: '8px', background: '#fdf0ee', color: '#c0392b', border: 'none', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Annuler</button>
+                            {(rdv.statut === 'en_attente' || rdv.statut === 'confirme') && (
+                              <button onClick={() => setModalAnnulation({ rdv, type: 'medecin' })} style={{ padding: '5px 10px', borderRadius: '8px', background: '#fdf0ee', color: '#c0392b', border: 'none', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Annuler</button>
                             )}
                           </div>
                         </div>
@@ -882,28 +929,45 @@ export default function DashboardPatient() {
                   })}
                 </div>
 
-                {rdvsPasses.length > 0 && (
+                {(rdvsPasses.length > 0 || rdvsAnnules.length > 0) && (
                   <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #f0ece2', overflow: 'hidden' }}>
-                    <div style={{ padding: '18px 22px', borderBottom: '1px solid #f0ece2' }}>
-                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 600, color: '#0d2b22' }}>Historique ({rdvsPasses.length})</div>
+                    <div style={{ padding: '18px 22px', borderBottom: '1px solid #f0ece2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.1rem', fontWeight: 600, color: '#0d2b22' }}>
+                        Historique ({rdvsPasses.length + rdvsAnnules.length})
+                      </div>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        {([
+                          { id: 'tous', label: 'Tous' },
+                          { id: 'termine', label: '✅ Terminés' },
+                          { id: 'annule', label: '❌ Annulés' },
+                        ] as const).map(f => (
+                          <button key={f.id} onClick={() => setFiltreHistorique(f.id)}
+                            style={{ padding: '5px 10px', borderRadius: '50px', border: 'none', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, background: filtreHistorique === f.id ? '#0d2b22' : '#f0ece2', color: filtreHistorique === f.id ? 'white' : '#7a7260' }}>
+                            {f.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    {rdvsPasses.map(rdv => {
-                      const s = statusColors[rdv.statut] || statusColors.termine
-                      const dejaNote = avisExistants[rdv.id]
-                      const peutNoter = rdv.statut === 'termine' && !dejaNote
-                      return (
-                        <div key={rdv.id} style={{ padding: isMobile ? '12px 16px' : '16px 22px', borderBottom: '1px solid #f0ece2', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                          <NomMedecin rdv={rdv} size="small" />
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-                            <div style={{ fontSize: '0.75rem', color: '#7a7260', whiteSpace: 'nowrap' }}>{new Date(rdv.date_rdv).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-                            <span style={{ padding: '3px 10px', borderRadius: '50px', background: s.bg, color: s.color, fontSize: '0.68rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
-                            {dejaNote && <Etoiles note={dejaNote} size="small" />}
-                            {peutNoter && (
-                              <button onClick={() => setModalAvis(rdv)} style={{ padding: '5px 10px', borderRadius: '8px', background: '#fdf8ec', color: '#c8992a', border: '1px solid rgba(200,153,42,0.3)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>⭐ Avis</button>
-                            )}
+                    {[...rdvsPasses, ...rdvsAnnules]
+                      .filter(rdv => filtreHistorique === 'tous' || rdv.statut === filtreHistorique)
+                      .sort((a: any, b: any) => new Date(b.date_rdv).getTime() - new Date(a.date_rdv).getTime())
+                      .map(rdv => {
+                        const s = statusColors[rdv.statut] || statusColors.termine
+                        const dejaNote = avisExistants[rdv.id]
+                        const peutNoter = rdv.statut === 'termine' && !dejaNote
+                        return (
+                          <div key={rdv.id} style={{ padding: isMobile ? '12px 16px' : '16px 22px', borderBottom: '1px solid #f0ece2', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                            <NomMedecin rdv={rdv} size="small" />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                              <div style={{ fontSize: '0.75rem', color: '#7a7260', whiteSpace: 'nowrap' }}>{new Date(rdv.date_rdv).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                              <span style={{ padding: '3px 10px', borderRadius: '50px', background: s.bg, color: s.color, fontSize: '0.68rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
+                              {dejaNote && <Etoiles note={dejaNote} size="small" />}
+                              {peutNoter && (
+                                <button onClick={() => setModalAvis(rdv)} style={{ padding: '5px 10px', borderRadius: '8px', background: '#fdf8ec', color: '#c8992a', border: '1px solid rgba(200,153,42,0.3)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>⭐ Avis</button>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )
+                        )
                     })}
                   </div>
                 )}
@@ -949,7 +1013,7 @@ export default function DashboardPatient() {
                             </div>
                             <span style={{ padding: '3px 10px', borderRadius: '50px', background: s.bg, color: s.color, fontSize: '0.68rem', fontWeight: 700, whiteSpace: 'nowrap' }}>{s.label}</span>
                             {(rdv.statut === 'en_attente' || rdv.statut === 'confirme') && (
-                              <button onClick={() => annulerRdvClinique(rdv)} style={{ padding: '5px 10px', borderRadius: '8px', background: '#fdf0ee', color: '#c0392b', border: 'none', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Annuler</button>
+                              <button onClick={() => setModalAnnulation({ rdv, type: 'clinique' })}) style={{ padding: '5px 10px', borderRadius: '8px', background: '#fdf0ee', color: '#c0392b', border: 'none', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Annuler</button>
                             )}
                           </div>
                         </div>
