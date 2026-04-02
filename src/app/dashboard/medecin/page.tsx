@@ -934,7 +934,7 @@ function ProfilForm({ profil, medecin, supabase, onSaved }: any) {
     { groupe: 'Autres', items: ['Anesthésiste', 'Médecin du travail', 'Médecin sportif', 'Nutritionniste / Diététicien', 'Infirmier(e)', 'Aide-soignant(e)'] },
   ]
 
-  const REGIONS = ['Antananarivo', 'Toamasina', 'Mahajanga', 'Fianarantsoa', 'Toliara', 'Antsiranana', 'Antsirabe', 'Ambositra', 'Morondava', 'Sambava', 'Manakara', 'Nosy Be']
+  const REGIONS = ['Analamanga', 'Vakinankaratra', 'Itasy', 'Bongolava', 'Matsiatra Ambony', "Amoron'i Mania", 'Vatovavy', 'Fitovinany', 'Atsimo-Atsinanana', 'Atsinanana', 'Analanjirofo', 'Alaotra-Mangoro', 'Boeny', 'Sofia', 'Betsiboka', 'Melaky', 'Atsimo-Andrefana', 'Androy', 'Anosy', 'Menabe', 'Diana', 'Sava']
   const LANGUES_DISPONIBLES = ['Malagasy', 'Français', 'Anglais', 'Arabe', 'Chinois', 'Comorien']
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm({ ...form, [e.target.name]: e.target.value })
@@ -1013,9 +1013,9 @@ function ProfilForm({ profil, medecin, supabase, onSaved }: any) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         <div>
-          <label style={labelStyle}>Ville / Région</label>
+          <label style={labelStyle}>Région</label>
           <select name="region" value={form.region} onChange={handleChange} style={inputStyle}>
-            <option value="">Choisir une ville</option>
+            <option value="">Choisir une région</option>
             {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
