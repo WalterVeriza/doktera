@@ -438,6 +438,7 @@ export default function RecherchePage() {
           {tab === 'profil' && (
             <div style={{ padding: '16px 24px', borderTop: '1px solid #f0ece2', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button onClick={() => setPanel((prev: any) => ({ ...prev, _tab: 'rdv' }))} style={{ padding: '11px', borderRadius: '10px', background: '#22816a', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', fontFamily: 'Outfit, sans-serif' }}>Prendre un rendez-vous</button>
+              <button onClick={() => router.push(`/medecin/${med.id}`)} style={{ padding: '11px', borderRadius: '10px', background: '#faf8f4', color: '#0d2b22', border: '1px solid #f0ece2', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'Outfit, sans-serif' }}>Voir la page complète →</button>
               <button onClick={() => setPanel(null)} style={{ padding: '11px', borderRadius: '10px', background: '#f0ece2', color: '#0d2b22', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'Outfit, sans-serif' }}>Fermer</button>
             </div>
           )}
