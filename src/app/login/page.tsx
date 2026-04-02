@@ -27,6 +27,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [inscriptionReussie, setInscriptionReussie] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [cguAcceptees, setCguAcceptees] = useState(false)
 
@@ -119,6 +120,24 @@ export default function LoginPage() {
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 70% 20%, rgba(34,129,106,0.3) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 20% 80%, rgba(200,153,42,0.15) 0%, transparent 60%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)', backgroundSize: '60px 60px', pointerEvents: 'none' }} />
 
+      {inscriptionReussie && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: 'white', borderRadius: '24px', padding: '48px 40px', maxWidth: '420px', width: '100%', textAlign: 'center', boxShadow: '0 48px 96px rgba(0,0,0,0.35)', position: 'relative', zIndex: 2 }}>
+            <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#e8f5f1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', margin: '0 auto 20px' }}>✅</div>
+            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 600, color: '#0d2b22', marginBottom: '12px' }}>Compte créé !</div>
+            <div style={{ fontSize: '0.88rem', color: '#7a7260', lineHeight: 1.7, marginBottom: '28px' }}>
+              Un email de confirmation a été envoyé à <strong>{form.email}</strong>.<br/>
+              Cliquez sur le lien dans l'email pour activer votre compte.
+            </div>
+            <div style={{ background: '#fdf8ec', borderRadius: '12px', padding: '14px 16px', border: '1px solid rgba(200,153,42,0.2)', fontSize: '0.82rem', color: '#a8906a', marginBottom: '24px' }}>
+              ⚠️ Vérifiez aussi vos spams si vous ne recevez pas l'email.
+            </div>
+            <button onClick={() => router.push('/login')} style={{ padding: '12px 32px', borderRadius: '12px', background: '#0d2b22', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.9rem' }}>
+              Aller à la connexion →
+            </button>
+          </div>
+        </div>
+      )}
       <div style={{
         background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
         borderRadius: isMobile ? '20px' : '28px',
