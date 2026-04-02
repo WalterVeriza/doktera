@@ -19,9 +19,21 @@ const MapComponent = dynamic(
 )
 
 const SPECIALITES = [
-  'Toutes les spécialités', 'Médecin généraliste', 'Cardiologue', 'Pédiatre',
-  'Dentiste', 'Sage-femme', 'Dermatologue', 'Gynécologue', 'Ophtalmologue',
-  'Kinésithérapeute', 'ORL', 'Psychiatre', 'Neurologue', 'Urgentiste',
+  'Toutes les spécialités',
+  'Médecin généraliste',
+  'Cardiologue', 'Pneumologue', 'Gastro-entérologue', 'Neurologue', 'Endocrinologue',
+  'Rhumatologue', 'Néphrologue', 'Hématologue', 'Infectiologue', 'Interniste',
+  'Oncologue', 'Gériatre', 'Urgentiste',
+  'Chirurgien général', 'Chirurgien orthopédiste', 'Chirurgien cardiaque',
+  'Chirurgien digestif', 'Neurochirurgien', 'Chirurgien plasticien', 'Urologue',
+  'Gynécologue', 'Obstétricien', 'Sage-femme', 'Pédiatre', 'Néonatologue',
+  'Ophtalmologue', 'ORL', 'Dentiste', 'Stomatologiste', 'Orthodontiste',
+  'Dermatologue',
+  'Psychiatre', 'Psychologue',
+  'Kinésithérapeute', 'Physiothérapeute', 'Ergothérapeute', 'Orthophoniste', 'Ostéopathe', 'Podologue',
+  'Radiologue', 'Biologiste médical', 'Anatomo-pathologiste',
+  'Anesthésiste', 'Médecin du travail', 'Médecin sportif', 'Nutritionniste / Diététicien',
+  'Infirmier(e)', 'Aide-soignant(e)',
 ]
 
 const CATEGORIES_CLINIQUE = [
