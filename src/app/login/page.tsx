@@ -125,7 +125,7 @@ export default function LoginPage() {
         <div style={{ background: '#fdf8ec', borderRadius: '12px', padding: '14px 16px', border: '1px solid rgba(200,153,42,0.2)', fontSize: '0.82rem', color: '#a8906a', marginBottom: '28px', lineHeight: 1.6 }}>
           ⚠️ Vérifiez aussi vos <strong>spams</strong> si vous ne recevez pas l'email.
         </div>
-        <button onClick={() => router.push('/login')} style={{ padding: '12px 32px', borderRadius: '12px', background: '#0d2b22', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.9rem', width: '100%' }}>
+        <button onClick={() => { setInscriptionReussie(false); setMode('connexion'); setForm({ email: '', password: '', prenom: '', nom: '', telephone: '', specialite: '' }); setCguAcceptees(false) }} style={{ padding: '12px 32px', borderRadius: '12px', background: '#0d2b22', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.9rem', width: '100%' }}>
           Aller à la connexion →
         </button>
       </div>
