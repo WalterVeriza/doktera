@@ -497,7 +497,7 @@ function GestionMedecins({ supabase }: any) {
 
   const load = async () => {
     setLoading(true)
-    const { data: medsData, error } = await supabase.from('medecins').select('*')
+    const { data: medsData, error } = await supabase.from('medecins').select('*, profil:profils(id, prenom, nom)')
     if (error) { console.log('medecins error:', error); setLoading(false); return }
     const ids = (medsData || []).map((m: any) => m.id)
     let profilMap: Record<string, any> = {}
@@ -508,7 +508,7 @@ function GestionMedecins({ supabase }: any) {
     setMedecins(
       (medsData || [])
         .filter((m: any) => m.specialite !== 'Clinique')
-        .map((m: any) => ({ ...m, profil: profilMap[m.id] || null }))
+        .map((m: any) => ({ ...m, profil: m.profil || profilMap[m.id] || null }))
     )
     setLoading(false)
   }
