@@ -1,4 +1,3 @@
-// src/app/login/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -87,16 +86,19 @@ export default function LoginPage() {
         if (role === 'medecin') {
           const { error: medecinError } = await supabase.from('medecins').insert({ id: data.user.id, specialite: form.specialite || 'Médecin généraliste' })
           if (medecinError) throw new Error('Erreur médecin : ' + medecinError.message)
-          router.push('/dashboard/medecin')
         } else if (role === 'clinique') {
           const { error: medecinError } = await supabase.from('medecins').insert({ id: data.user.id, specialite: 'Clinique' })
-          if (medecinError) throw new Error('Erreur clinique : ' + medecinError.message)
-          router.push('/dashboard/clinique')
+          if (medecinError) throw new Error('Erreur clinique medecin : ' + medecinError.message)
+          const { error: cliniqueError } = await supabase.from('cliniques').insert({ admin_id: data.user.id, nom: form.prenom, plan_actif: false })
+          if (cliniqueError) throw new Error('Erreur clinique : ' + cliniqueError.message)
         } else {
           const { error: patientError } = await supabase.from('patients').insert({ id: data.user.id })
           if (patientError) throw new Error('Erreur patient : ' + patientError.message)
-          router.push('/dashboard/patient')
         }
+
+        setInscriptionReussie(true)
+        setLoading(false)
+        return
       }
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue')
@@ -110,6 +112,26 @@ export default function LoginPage() {
     color: '#1a1512', outline: 'none', width: '100%', boxSizing: 'border-box',
   }
 
+  if (inscriptionReussie) return (
+    <div style={{ minHeight: '100vh', background: '#0d2b22', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', fontFamily: 'Outfit, sans-serif' }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 70% 20%, rgba(34,129,106,0.3) 0%, transparent 60%)', pointerEvents: 'none' }} />
+      <div style={{ background: 'white', borderRadius: '24px', padding: isMobile ? '36px 24px' : '48px 40px', maxWidth: '420px', width: '100%', textAlign: 'center', boxShadow: '0 48px 96px rgba(0,0,0,0.35)', position: 'relative', zIndex: 1 }}>
+        <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#e8f5f1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', margin: '0 auto 20px' }}>✅</div>
+        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 600, color: '#0d2b22', marginBottom: '12px' }}>Compte créé !</div>
+        <div style={{ fontSize: '0.88rem', color: '#7a7260', lineHeight: 1.7, marginBottom: '24px' }}>
+          Un email de confirmation a été envoyé à <strong>{form.email}</strong>.<br />
+          Cliquez sur le lien dans l'email pour activer votre compte.
+        </div>
+        <div style={{ background: '#fdf8ec', borderRadius: '12px', padding: '14px 16px', border: '1px solid rgba(200,153,42,0.2)', fontSize: '0.82rem', color: '#a8906a', marginBottom: '28px', lineHeight: 1.6 }}>
+          ⚠️ Vérifiez aussi vos <strong>spams</strong> si vous ne recevez pas l'email.
+        </div>
+        <button onClick={() => router.push('/login')} style={{ padding: '12px 32px', borderRadius: '12px', background: '#0d2b22', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.9rem', width: '100%' }}>
+          Aller à la connexion →
+        </button>
+      </div>
+    </div>
+  )
+
   return (
     <div style={{
       minHeight: '100vh', background: '#0d2b22',
@@ -120,24 +142,6 @@ export default function LoginPage() {
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 70% 20%, rgba(34,129,106,0.3) 0%, transparent 60%), radial-gradient(ellipse 60% 80% at 20% 80%, rgba(200,153,42,0.15) 0%, transparent 60%)', pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)', backgroundSize: '60px 60px', pointerEvents: 'none' }} />
 
-      {inscriptionReussie && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ background: 'white', borderRadius: '24px', padding: '48px 40px', maxWidth: '420px', width: '100%', textAlign: 'center', boxShadow: '0 48px 96px rgba(0,0,0,0.35)', position: 'relative', zIndex: 2 }}>
-            <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#e8f5f1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', margin: '0 auto 20px' }}>✅</div>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 600, color: '#0d2b22', marginBottom: '12px' }}>Compte créé !</div>
-            <div style={{ fontSize: '0.88rem', color: '#7a7260', lineHeight: 1.7, marginBottom: '28px' }}>
-              Un email de confirmation a été envoyé à <strong>{form.email}</strong>.<br/>
-              Cliquez sur le lien dans l'email pour activer votre compte.
-            </div>
-            <div style={{ background: '#fdf8ec', borderRadius: '12px', padding: '14px 16px', border: '1px solid rgba(200,153,42,0.2)', fontSize: '0.82rem', color: '#a8906a', marginBottom: '24px' }}>
-              ⚠️ Vérifiez aussi vos spams si vous ne recevez pas l'email.
-            </div>
-            <button onClick={() => router.push('/login')} style={{ padding: '12px 32px', borderRadius: '12px', background: '#0d2b22', color: 'white', border: 'none', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.9rem' }}>
-              Aller à la connexion →
-            </button>
-          </div>
-        </div>
-      )}
       <div style={{
         background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(20px)',
         borderRadius: isMobile ? '20px' : '28px',
@@ -232,7 +236,6 @@ export default function LoginPage() {
                     </div>
                   )}
                   <input name="telephone" placeholder="Téléphone (034 XX XXX XX)" value={form.telephone} onChange={handleChange} style={inputStyle} />
-
                   {role === 'medecin' && (
                     <select name="specialite" value={form.specialite} onChange={handleChange} style={{ ...inputStyle, color: form.specialite ? '#1a1512' : '#a8a090' }}>
                       <option value="">— Choisir une spécialité —</option>
@@ -273,7 +276,6 @@ export default function LoginPage() {
 
               <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleChange} style={inputStyle} />
 
-              {/* MOT DE PASSE AVEC AFFICHER/MASQUER */}
               <div style={{ position: 'relative' }}>
                 <input name="password" type={showPassword ? 'text' : 'password'}
                   placeholder="Mot de passe (min. 6 caractères)" value={form.password}
@@ -288,7 +290,6 @@ export default function LoginPage() {
                 </button>
               </div>
 
-              {/* MOT DE PASSE OUBLIÉ */}
               {mode === 'connexion' && (
                 <div style={{ textAlign: 'right', marginTop: '-4px' }}>
                   <button onClick={() => { setMode('oubli'); setError('') }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: '#22816a', fontFamily: 'Outfit, sans-serif', fontWeight: 600, padding: 0 }}>
@@ -297,7 +298,6 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {/* CASE CGU */}
               {mode === 'inscription' && (
                 <div onClick={() => setCguAcceptees(v => !v)} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', padding: '10px 12px', background: cguAcceptees ? '#e8f5f1' : '#faf8f4', borderRadius: '10px', border: `1.5px solid ${cguAcceptees ? '#22816a' : '#f0ece2'}`, transition: 'all 0.2s' }}>
                   <div style={{ width: '18px', height: '18px', borderRadius: '5px', background: cguAcceptees ? '#22816a' : 'white', border: `2px solid ${cguAcceptees ? '#22816a' : '#d0c8bc'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
