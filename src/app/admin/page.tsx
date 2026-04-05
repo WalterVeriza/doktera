@@ -344,8 +344,12 @@ function GestionPaiements({ supabase }: any) {
     const userIds = [...new Set((paiementsData || []).map((p: any) => p.user_id))]
     let profilMap: Record<string, any> = {}
     if (userIds.length > 0) {
-      const { data: profils } = await supabase.from('profils').select('id, prenom, nom, email').in('id', userIds)
+      const { data: profils } = await supabase.from('profils').select('id, prenom, nom').in('id', userIds)
       profilMap = Object.fromEntries((profils || []).map((p: any) => [p.id, p]))
+      const { data: { users: usersP } } = await supabase.auth.admin.listUsers()
+      const emailMapP: Record<string, string> = {}
+      ;(usersP || []).forEach((u: any) => { emailMapP[u.id] = u.email })
+      Object.keys(profilMap).forEach(id => { profilMap[id].email = emailMapP[id] || '' })
     }
     setPaiements((paiementsData || []).map((p: any) => ({ ...p, user: profilMap[p.user_id] || null })))
     setLoading(false)
@@ -390,7 +394,21 @@ function GestionPaiements({ supabase }: any) {
     load(); setActionLoading(null)
   }
 
-  const paiementsFiltres = filtre === 'tous' ? paiements : paiements.filter(p => p.statut === filtre)
+  const paiementsFiltres = paiements
+    .filter(p => filtre === 'tous' || p.statut === filtre)
+    .filter(p => {
+      if (!filtreMois) return true
+      const d = new Date(p.created_at)
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` === filtreMois
+    })
+  
+  // Générer liste des mois disponibles
+  const moisDisponibles = [...new Set(paiements.map(p => {
+    const d = new Date(p.created_at)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+  }))].sort().reverse()
+  
+  const revenuMois = paiementsFiltres.filter(p => p.statut === 'valide').reduce((s, p) => s + (p.montant || 0), 0)
   const statutColors: Record<string, { bg: string, color: string, label: string }> = {
     en_attente: { bg: '#fdf8ec', color: '#c8992a', label: '⏳ En attente' },
     valide: { bg: '#e8f5f1', color: '#22816a', label: '✅ Validé' },
@@ -418,7 +436,23 @@ function GestionPaiements({ supabase }: any) {
           </div>
         ))}
       </div>
-      <div style={{ display: 'flex', gap: '8px' }}>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <select value={filtreMois} onChange={e => setFiltreMois(e.target.value)}
+          style={{ padding: '7px 12px', borderRadius: '50px', border: '1.5px solid #f0ece2', background: filtreMois ? '#e8f5f1' : 'white', fontFamily: 'Outfit, sans-serif', fontSize: '0.78rem', color: '#1a1512', outline: 'none', cursor: 'pointer' }}>
+          <option value="">Tous les mois</option>
+          {moisDisponibles.map(m => {
+            const [y, mo] = m.split('-')
+            const label = new Date(Number(y), Number(mo) - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+            return <option key={m} value={m}>{label}</option>
+          })}
+        </select>
+        {filtreMois && (
+          <div style={{ padding: '7px 14px', borderRadius: '50px', background: '#fdf8ec', border: '1px solid rgba(200,153,42,0.3)', fontSize: '0.78rem', fontWeight: 700, color: '#c8992a' }}>
+            💰 {revenuMois.toLocaleString()} Ar validés
+          </div>
+        )}
+      </div>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
         {['tous', 'en_attente', 'valide', 'refuse'].map(f => {
           const labels: Record<string, string> = { tous: 'Tous', en_attente: '⏳ En attente', valide: '✅ Validés', refuse: '❌ Refusés' }
           const count = f === 'tous' ? paiements.length : paiements.filter(p => p.statut === f).length
@@ -502,8 +536,13 @@ function GestionMedecins({ supabase }: any) {
     const ids = (medsData || []).map((m: any) => m.id)
     let profilMap: Record<string, any> = {}
     if (ids.length > 0) {
-      const { data: profils } = await supabase.from('profils').select('id, prenom, nom, email').in('id', ids)
+      const { data: profils } = await supabase.from('profils').select('id, prenom, nom').in('id', ids)
       profilMap = Object.fromEntries((profils || []).map((p: any) => [p.id, p]))
+      // Récupérer emails depuis auth.users
+      const { data: { users } } = await supabase.auth.admin.listUsers()
+      const emailMap: Record<string, string> = {}
+      ;(users || []).forEach((u: any) => { emailMap[u.id] = u.email })
+      Object.keys(profilMap).forEach(id => { profilMap[id].email = emailMap[id] || '' })
     }
     setMedecins(
       (medsData || [])
@@ -620,8 +659,12 @@ function GestionCliniques({ supabase }: any) {
     const adminIds = (clData || []).map((c: any) => c.admin_id).filter(Boolean)
     let profilMap: Record<string, any> = {}
     if (adminIds.length > 0) {
-      const { data: profils } = await supabase.from('profils').select('id, prenom, nom, email').in('id', adminIds)
+      const { data: profils } = await supabase.from('profils').select('id, prenom, nom').in('id', adminIds)
       profilMap = Object.fromEntries((profils || []).map((p: any) => [p.id, p]))
+      const { data: { users: usersC } } = await supabase.auth.admin.listUsers()
+      const emailMapC: Record<string, string> = {}
+      ;(usersC || []).forEach((u: any) => { emailMapC[u.id] = u.email })
+      Object.keys(profilMap).forEach(id => { profilMap[id].email = emailMapC[id] || '' })
     }
     setCliniques((clData || []).map((c: any) => ({ ...c, admin: profilMap[c.admin_id] || null })))
     setLoading(false)
