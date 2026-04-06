@@ -335,6 +335,7 @@ function GestionPaiements({ supabase }: any) {
   const [paiements, setPaiements] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [filtre, setFiltre] = useState('en_attente')
+  const [filtreMois, setFiltreMois] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   const load = async () => {
