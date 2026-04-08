@@ -1,3 +1,20 @@
+export function toLocalISO(dateStr: string, heure: string): string {
+  const [annee, mois, jour] = dateStr.split('-').map(Number)
+  const [h, m] = heure.split(':').map(Number)
+  const d = new Date(annee, mois - 1, jour, h, m, 0, 0)
+  const off = -d.getTimezoneOffset()
+  const sign = off >= 0 ? '+' : '-'
+  const hOff = Math.floor(Math.abs(off) / 60).toString().padStart(2, '0')
+  const mOff = (Math.abs(off) % 60).toString().padStart(2, '0')
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  return `${annee}-${pad(mois)}-${pad(jour)}T${pad(h)}:${pad(m)}:00${sign}${hOff}:${mOff}`
+}
+
+export function isoToLocalHHMM(isoStr: string): string {
+  const d = new Date(isoStr)
+  return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
+}
+
 export function genererCreneaux(debut: string, fin: string, duree: number): string[] {
   const creneaux: string[] = []
   const [hd, md] = debut.split(':').map(Number)
@@ -16,81 +33,44 @@ export function genererCreneaux(debut: string, fin: string, duree: number): stri
 export async function getCreneauxDisponibles(
   supabase: any,
   medecinId: string,
-  dateStr: string // format YYYY-MM-DD
+  dateStr: string
 ): Promise<string[]> {
-  const date = new Date(dateStr)
-  // 0=Dimanche en JS, on convertit en 0=Lundi
-  let jourJS = date.getDay()
-  let jourSemaine = jourJS === 0 ? 6 : jourJS - 1 // Dimanche = 6, Lundi = 0
+  // Fix bug UTC : T12:00:00 évite le décalage de jour sur les fuseaux UTC-
+  const date = new Date(dateStr + 'T12:00:00')
+  const jourJS = date.getDay()
+  const jourSemaine = jourJS === 0 ? 6 : jourJS - 1
 
-  // 1. Récupérer les dispos du médecin pour ce jour
-  const { data: dispo } = await supabase
-    .from('disponibilites')
-    .select('*')
-    .eq('medecin_id', medecinId)
-    .eq('jour_semaine', jourSemaine)
-    .eq('actif', true)
-    .single()
+  const debutJour = toLocalISO(dateStr, '00:00')
+  const finJour = toLocalISO(dateStr, '23:59')
 
-  if (!dispo) return [] // Pas de dispo ce jour
+  // Requêtes parallèles — ~3x plus rapide
+  const [
+    { data: dispo },
+    { data: rdvsPris },
+    { data: blocagesManuels },
+    { data: absences },
+  ] = await Promise.all([
+    supabase.from('disponibilites').select('*').eq('medecin_id', medecinId).eq('jour_semaine', jourSemaine).eq('actif', true).single(),
+    supabase.from('rendez_vous').select('date_rdv').eq('medecin_id', medecinId).gte('date_rdv', debutJour).lte('date_rdv', finJour).in('statut', ['en_attente', 'confirme']),
+    supabase.from('creneaux_manuels').select('date_creneau').eq('medecin_id', medecinId).gte('date_creneau', debutJour).lte('date_creneau', finJour),
+    supabase.from('creneaux_bloques').select('date_debut, date_fin').eq('medecin_id', medecinId).lte('date_debut', finJour).gte('date_fin', debutJour),
+  ])
 
-  // 2. Générer tous les créneaux théoriques
-  const tousLesCreneaux = genererCreneaux(dispo.heure_debut, dispo.heure_fin, dispo.duree_creneau)
+  if (!dispo) return []
 
-  // 3. Récupérer les RDV déjà pris ce jour
-  const debutJour = `${dateStr}T00:00:00`
-  const finJour = `${dateStr}T23:59:59`
-
-  const { data: rdvsPris } = await supabase
-    .from('rendez_vous')
-    .select('date_rdv')
-    .eq('medecin_id', medecinId)
-    .gte('date_rdv', debutJour)
-    .lte('date_rdv', finJour)
-    .in('statut', ['en_attente', 'confirme'])
-
-  const heuresPrises = new Set(
-    (rdvsPris || []).map((r: any) => {
-      const d = new Date(r.date_rdv)
-      return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
-    })
+  // Fix bug UTC sur comparaison absences
+  const jourBloque = (absences || []).some((a: any) =>
+    new Date(a.date_debut) <= date && new Date(a.date_fin) >= date
   )
-
-  // 4. Récupérer les blocages manuels ce jour (pauses, patients externes)
-  const { data: blocagesManuels } = await supabase
-    .from('creneaux_manuels')
-    .select('date_creneau')
-    .eq('medecin_id', medecinId)
-    .gte('date_creneau', debutJour)
-    .lte('date_creneau', finJour)
-
-  const heuresBloqueesManuel = new Set(
-    (blocagesManuels || []).map((b: any) => {
-      const d = new Date(b.date_creneau)
-      return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
-    })
-  )
-
-  // 5. Récupérer les congés/absences longues
-  const { data: absences } = await supabase
-    .from('creneaux_bloques')
-    .select('date_debut, date_fin')
-    .eq('medecin_id', medecinId)
-    .lte('date_debut', finJour)
-    .gte('date_fin', debutJour)
-
-  // Vérifier si le jour entier est dans une absence
-  const jourBloque = (absences || []).some((a: any) => {
-    return new Date(a.date_debut) <= date && new Date(a.date_fin) >= date
-  })
-
   if (jourBloque) return []
 
-  // 6. Filtrer les créneaux disponibles
+  const tousLesCreneaux = genererCreneaux(dispo.heure_debut, dispo.heure_fin, dispo.duree_creneau)
+  const heuresPrises = new Set<string>((rdvsPris || []).map((r: any) => isoToLocalHHMM(r.date_rdv)))
+  const heuresBloqueesManuel = new Set<string>((blocagesManuels || []).map((b: any) => isoToLocalHHMM(b.date_creneau)))
+
   return tousLesCreneaux.filter(c => !heuresPrises.has(c) && !heuresBloqueesManuel.has(c))
 }
 
 export function formatCreneau(heure: string): string {
-  // Convertit "08:00" en "08h00"
   return heure.replace(':', 'h')
 }

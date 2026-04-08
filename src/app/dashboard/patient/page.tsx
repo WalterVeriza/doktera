@@ -8,6 +8,7 @@ import Messagerie from '@/components/shared/Messagerie'
 import AvatarUpload from '@/components/shared/AvatarUpload'
 import Avatar from '@/components/shared/Avatar'
 import DossierMedical from '@/components/shared/DossierMedical'
+import { toLocalISO, isoToLocalHHMM, getCreneauxDisponibles } from '@/lib/creneaux'
 
 const CATEGORIES_CLINIQUE = [
   { id: 'consultation', label: 'Consultations spécialisées', icon: '🩺' },
@@ -45,34 +46,6 @@ function toLocalISO(dateStr: string, heure: string): string {
 function isoToLocalHHMM(isoStr: string): string {
   const d = new Date(isoStr)
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
-}
-
-async function getCreneauxDisponibles(supabase: any, medecinId: string, dateStr: string): Promise<string[]> {
-  const date = new Date(dateStr + 'T12:00:00')
-  const jourJS = date.getDay()
-  const jourSemaine = jourJS === 0 ? 6 : jourJS - 1
-  const { data: dispo } = await supabase.from('disponibilites').select('*').eq('medecin_id', medecinId).eq('jour_semaine', jourSemaine).eq('actif', true).single()
-  if (!dispo) return []
-  const creneaux: string[] = []
-  const [hd, md] = dispo.heure_debut.split(':').map(Number)
-  const [hf, mf] = dispo.heure_fin.split(':').map(Number)
-  let total = hd * 60 + md
-  const finMin = hf * 60 + mf
-  while (total + dispo.duree_creneau <= finMin) {
-    const h = Math.floor(total / 60).toString().padStart(2, '0')
-    const m = (total % 60).toString().padStart(2, '0')
-    creneaux.push(`${h}:${m}`)
-    total += dispo.duree_creneau
-  }
-  const debutJour = toLocalISO(dateStr, '00:00')
-  const finJour = toLocalISO(dateStr, '23:59')
-  const { data: rdvsPris } = await supabase.from('rendez_vous').select('date_rdv').eq('medecin_id', medecinId).gte('date_rdv', debutJour).lte('date_rdv', finJour).in('statut', ['en_attente', 'confirme'])
-  const heuresPrises = new Set((rdvsPris || []).map((r: any) => isoToLocalHHMM(r.date_rdv)))
-  const { data: blocagesManuels } = await supabase.from('creneaux_manuels').select('date_creneau').eq('medecin_id', medecinId).gte('date_creneau', debutJour).lte('date_creneau', finJour)
-  const heuresBloqueesManuel = new Set((blocagesManuels || []).map((b: any) => isoToLocalHHMM(b.date_creneau)))
-  const { data: absences } = await supabase.from('creneaux_bloques').select('date_debut, date_fin').eq('medecin_id', medecinId).lte('date_debut', finJour).gte('date_fin', debutJour)
-  if ((absences || []).length > 0) return []
-  return creneaux.filter(c => !heuresPrises.has(c) && !heuresBloqueesManuel.has(c))
 }
 
 function Etoiles({ note, size = 'normal' }: { note: number, size?: 'normal' | 'small' }) {
