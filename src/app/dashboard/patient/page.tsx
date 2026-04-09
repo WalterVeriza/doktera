@@ -29,26 +29,7 @@ function useWindowWidth() {
     return () => window.removeEventListener('resize', handler)
   }, [])
   return width
-}
-
-function toLocalISO(dateStr: string, heure: string): string {
-  const [annee, mois, jour] = dateStr.split('-').map(Number)
-  const [h, m] = heure.split(':').map(Number)
-  const d = new Date(annee, mois - 1, jour, h, m, 0, 0)
-  const off = -d.getTimezoneOffset()
-  const sign = off >= 0 ? '+' : '-'
-  const hOff = Math.floor(Math.abs(off) / 60).toString().padStart(2, '0')
-  const mOff = (Math.abs(off) % 60).toString().padStart(2, '0')
-  const pad = (n: number) => n.toString().padStart(2, '0')
-  return `${annee}-${pad(mois)}-${pad(jour)}T${pad(h)}:${pad(m)}:00${sign}${hOff}:${mOff}`
-}
-
-function isoToLocalHHMM(isoStr: string): string {
-  const d = new Date(isoStr)
-  return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
-}
-
-function Etoiles({ note, size = 'normal' }: { note: number, size?: 'normal' | 'small' }) {
+}function Etoiles({ note, size = 'normal' }: { note: number, size?: 'normal' | 'small' }) {
   const s = size === 'small' ? '0.85rem' : '1.1rem'
   return (
     <span style={{ fontSize: s, letterSpacing: '1px' }}>
