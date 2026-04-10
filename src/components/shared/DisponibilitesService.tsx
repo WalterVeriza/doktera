@@ -195,15 +195,16 @@ export default function DisponibilitesService({ service, supabase }: {
     }))
     const { error } = await supabase.from('clinique_creneaux_manuels').insert(insertsFinaux)
     if (error) {
-      setDebugMsg(`Erreur: ${error.message}`)
+      console.error('Erreur blocage manuel:', error.message)
     } else {
-      setDebugMsg(`✅ ${insertsFinaux.length} créneau(x) bloqué(s)`)
+      console.log(`✅ ${insertsFinaux.length} créneau(x) bloqué(s)`)
       setBlocageManuelForm({ date: '', creneauxSelectionnes: [], motif: 'Indisponible' })
       setCreneauxDuJour([])
       setShowBlocageManuel(false)
     }
     setSavingBlocage(false)
-    setTimeout(() => setDebugMsg(''), 4000)
+    setTimeout(() =>
+, 4000)
     load()
   }
 
@@ -231,7 +232,6 @@ export default function DisponibilitesService({ service, supabase }: {
 
   const ajouterBlocageRecurrent = async () => {
     setSavingRecurrent(true)
-    setDebugMsg('')
     const inserts: any[] = []
     const aujourd = new Date()
     aujourd.setHours(0, 0, 0, 0)
@@ -274,19 +274,19 @@ export default function DisponibilitesService({ service, supabase }: {
     }
 
     if (inserts.length === 0) {
-      setDebugMsg('⚠ Aucun créneau trouvé — vérifiez que les jours sélectionnés sont actifs')
       setSavingRecurrent(false)
       return
     }
     const { error } = await supabase.from('clinique_creneaux_manuels').insert(inserts)
     if (error) {
-      setDebugMsg(`Erreur: ${error.message}`)
+      console.error('Erreur blocage manuel:', error.message)
     } else {
-      setDebugMsg(`✅ ${inserts.length} créneau(x) bloqué(s) sur ${blocageRecurrentForm.semaines} semaines`)
+ bloqué(s) sur ${blocageRecurrentForm.semaines} semaines`)
       setShowBlocageRecurrent(false)
     }
     setSavingRecurrent(false)
-    setTimeout(() => setDebugMsg(''), 5000)
+    setTimeout(() =>
+, 5000)
     load()
   }
 
