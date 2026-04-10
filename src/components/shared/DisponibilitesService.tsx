@@ -51,7 +51,6 @@ export default function DisponibilitesService({ service, supabase }: {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [jourPreview, setJourPreview] = useState<number | null>(null)
-  const [debugMsg, setDebugMsg] = useState('')
 
   // Blocages ponctuels
   const [creneauxManuels, setCreneauxManuels] = useState<any[]>([])
