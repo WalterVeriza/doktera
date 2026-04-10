@@ -280,12 +280,11 @@ export default function DisponibilitesService({ service, supabase }: {
     if (error) {
       console.error('Erreur blocage manuel:', error.message)
     } else {
- bloqué(s) sur ${blocageRecurrentForm.semaines} semaines`)
+      console.log(`✅ Blocages récurrents ajoutés sur ${blocageRecurrentForm.semaines} semaines`)
       setShowBlocageRecurrent(false)
     }
     setSavingRecurrent(false)
-    setTimeout(() =>
-, 5000)
+    setTimeout(() => setSaved(true), 5000)
     load()
   }
 
