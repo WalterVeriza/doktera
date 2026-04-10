@@ -203,8 +203,7 @@ export default function DisponibilitesService({ service, supabase }: {
       setShowBlocageManuel(false)
     }
     setSavingBlocage(false)
-    setTimeout(() =>
-, 4000)
+    setTimeout(() => setSaved(true), 4000)
     load()
   }
 
