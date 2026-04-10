@@ -338,11 +338,7 @@ export default function DisponibilitesService({ service, supabase }: {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-      {debugMsg && (
-        <div style={{ padding: '12px 16px', borderRadius: '10px', background: debugMsg.startsWith('✅') ? '#e8f5f1' : '#fdf0ee', color: debugMsg.startsWith('✅') ? '#22816a' : '#c0392b', fontWeight: 600, fontSize: '0.85rem' }}>
-          {debugMsg}
-        </div>
-      )}
+
 
       {/* STATS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
